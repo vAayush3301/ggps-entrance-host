@@ -21,4 +21,12 @@ public class Test {
     public List<Question> getQuestions() {
         return questions;
     }
+
+    public void setTestName(String testName) {
+        this.testName = testName;
+    }
+
+    public void setQuestions(List<Question> questions) {
+        this.questions = questions;
+    }
 }
