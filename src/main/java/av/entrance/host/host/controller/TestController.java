@@ -1,6 +1,7 @@
 package av.entrance.host.host.controller;
 
 import av.entrance.host.host.model.Test;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -57,5 +58,10 @@ public class TestController {
         latch.await(5, TimeUnit.SECONDS);
 
         return list;
+    }
+
+    @GetMapping("/firebase-check")
+    public String check() {
+        return "Apps = " + FirebaseApp.getApps().size();
     }
 }
