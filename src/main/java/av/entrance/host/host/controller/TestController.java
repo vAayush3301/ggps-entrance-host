@@ -2,7 +2,6 @@ package av.entrance.host.host.controller;
 
 import av.entrance.host.host.model.Question;
 import av.entrance.host.host.model.Test;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,23 +28,30 @@ public class TestController {
     }
 
     @GetMapping("/get_tests")
-    public List<Test> getAllTests() throws InterruptedException {
+    public List<Test> getAllTests() throws Exception {
 
         DatabaseReference ref = FirebaseDatabase.getInstance()
-                .getReference("tests");
+                .getReference()
+                .child("tests");
 
-        List<Test> tests = new ArrayList<>();
+        System.out.println("Fetching tests...");
+
+        List<Test> result = new ArrayList<>();
         CountDownLatch latch = new CountDownLatch(1);
 
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
+
             @Override
             public void onDataChange(DataSnapshot snapshot) {
+                System.out.println("Snapshot exists: " + snapshot.exists());
+                System.out.println("Children count: " + snapshot.getChildrenCount());
 
                 for (DataSnapshot testSnap : snapshot.getChildren()) {
 
-                    String testId = testSnap.getKey();
-                    String testName = testSnap.child("testName")
-                            .getValue(String.class);
+                    System.out.println("Test key: " + testSnap.getKey());
+
+                    String testName =
+                            testSnap.child("testName").getValue(String.class);
 
                     List<Question> questions = new ArrayList<>();
                     for (DataSnapshot qSnap :
@@ -55,7 +61,9 @@ public class TestController {
                         questions.add(q);
                     }
 
-                    tests.add(new Test(testId, testName, questions));
+                    result.add(
+                            new Test(testSnap.getKey(), testName, questions)
+                    );
                 }
 
                 latch.countDown();
@@ -63,11 +71,14 @@ public class TestController {
 
             @Override
             public void onCancelled(DatabaseError error) {
+                System.out.println("Firebase error: " + error.getMessage());
                 latch.countDown();
             }
         });
 
-        latch.await(5, TimeUnit.SECONDS);
-        return tests;
+        latch.await(10, TimeUnit.SECONDS);
+
+        System.out.println("Returning tests: " + result.size());
+        return result;
     }
 }
