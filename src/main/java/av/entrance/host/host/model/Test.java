@@ -6,6 +6,9 @@ public class Test {
     private String testName;
     private List<Question> questions;
 
+    public Test() {
+    }
+
     public Test(String testName, List<Question> questions) {
         this.testName = testName;
         this.questions = questions;

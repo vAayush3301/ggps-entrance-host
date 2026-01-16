@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.Base64;
 
 @Configuration
 public class FirebaseConfig {
