@@ -17,12 +17,9 @@ public class FirebaseConfig {
     public void init() throws IOException {
         if (FirebaseApp.getApps().isEmpty()) {
             String base64 = System.getenv("SERVICE_ACCOUNT_BASE64");
-            System.out.println(base64);
-            byte[] decoded = Base64.getDecoder().decode(base64);
-            System.out.println(decoded);
 
             FirebaseOptions options = FirebaseOptions.builder()
-                    .setCredentials(GoogleCredentials.fromStream(new ByteArrayInputStream(decoded)))
+                    .setCredentials(GoogleCredentials.fromStream(new ByteArrayInputStream(base64.getBytes())))
                     .setDatabaseUrl("https://cbt-544-as-default-rtdb.asia-southeast1.firebasedatabase.app")
                     .build();
 
