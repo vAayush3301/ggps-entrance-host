@@ -28,44 +28,29 @@ public class TestController {
     }
 
     @GetMapping("/get_tests")
-    public List<Test> getAllTests() throws Exception {
-
+    public List<Test> getAllTests() throws InterruptedException {
         DatabaseReference ref = FirebaseDatabase.getInstance()
-                .getReference()
-                .child("tests");
-
-        System.out.println("Fetching tests...");
+                .getReference("tests");
 
         List<Test> result = new ArrayList<>();
         CountDownLatch latch = new CountDownLatch(1);
 
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
-
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                System.out.println("Snapshot exists: " + snapshot.exists());
-                System.out.println("Children count: " + snapshot.getChildrenCount());
-
                 for (DataSnapshot testSnap : snapshot.getChildren()) {
-
-                    System.out.println("Test key: " + testSnap.getKey());
-
-                    String testName =
-                            testSnap.child("testName").getValue(String.class);
+                    String testId = testSnap.getKey();
+                    String testName = testSnap.child("testName").getValue(String.class);
 
                     List<Question> questions = new ArrayList<>();
-                    for (DataSnapshot qSnap :
-                            testSnap.child("questions").getChildren()) {
-
+                    for (DataSnapshot qSnap : testSnap.child("questions").getChildren()) {
                         Question q = qSnap.getValue(Question.class);
-                        questions.add(q);
+                        if (q != null) questions.add(q);
+                        else System.out.println("⚠️ Question null for key: " + qSnap.getKey());
                     }
 
-                    result.add(
-                            new Test(testSnap.getKey(), testName, questions)
-                    );
+                    result.add(new Test(testId, testName, questions));
                 }
-
                 latch.countDown();
             }
 
@@ -77,8 +62,8 @@ public class TestController {
         });
 
         latch.await(10, TimeUnit.SECONDS);
-
         System.out.println("Returning tests: " + result.size());
         return result;
     }
+
 }
