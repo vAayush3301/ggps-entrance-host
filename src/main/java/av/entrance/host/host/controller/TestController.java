@@ -43,6 +43,7 @@ public class TestController {
                 for (DataSnapshot child : snapshot.getChildren()) {
                     Test test = child.getValue(Test.class);
                     list.add(test);
+                    System.out.println(list);
                 }
                 latch.countDown();
             }
