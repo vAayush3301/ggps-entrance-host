@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/api/test")
@@ -26,33 +28,33 @@ public class TestController {
     }
 
     @GetMapping("/get_tests")
-    public CompletableFuture<List<Test>> getAllTests() {
+    public List<Test> getAllTests() throws Exception {
 
         DatabaseReference ref = FirebaseDatabase.getInstance()
                 .getReference("tests");
 
-        CompletableFuture<List<Test>> future = new CompletableFuture<>();
+        List<Test> list = new ArrayList<>();
+
+        CountDownLatch latch = new CountDownLatch(1);
 
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                List<Test> list = new ArrayList<>();
-
                 for (DataSnapshot child : snapshot.getChildren()) {
                     Test test = child.getValue(Test.class);
                     list.add(test);
                 }
-
-                future.complete(list);
+                latch.countDown();
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-                future.completeExceptionally(databaseError.toException());
+            public void onCancelled(DatabaseError error) {
+                latch.countDown();
             }
         });
 
-        return future;
-    }
+        latch.await(5, TimeUnit.SECONDS);
 
+        return list;
+    }
 }
