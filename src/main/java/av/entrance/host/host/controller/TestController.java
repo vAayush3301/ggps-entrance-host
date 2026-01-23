@@ -1,6 +1,8 @@
 package av.entrance.host.host.controller;
 
 import av.entrance.host.host.model.Question;
+import av.entrance.host.host.model.Response;
+import av.entrance.host.host.model.SubmitResponse;
 import av.entrance.host.host.model.Test;
 import com.google.firebase.database.*;
 import org.springframework.http.ResponseEntity;
@@ -64,6 +66,18 @@ public class TestController {
         latch.await(10, TimeUnit.SECONDS);
         System.out.println("Returning tests: " + result.size());
         return result;
+    }
+
+    @PostMapping("/submitResponse")
+    public ResponseEntity<String> submitResponse(@RequestBody SubmitResponse response) {
+        DatabaseReference ref =
+                FirebaseDatabase.getInstance()
+                        .getReference("responses").child(response.date).child(response.testId).child(response.userId)
+                        .push();
+
+        ref.setValueAsync(response.responses);
+
+        return ResponseEntity.ok("Responses submitted with key: " + ref.getKey());
     }
 
 }
