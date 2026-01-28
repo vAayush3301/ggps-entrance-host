@@ -1,7 +1,6 @@
 package av.entrance.host.host.controller;
 
 import av.entrance.host.host.model.Question;
-import av.entrance.host.host.model.Response;
 import av.entrance.host.host.model.SubmitResponse;
 import av.entrance.host.host.model.Test;
 import com.google.firebase.database.*;
@@ -69,15 +68,17 @@ public class TestController {
     }
 
     @PostMapping("/submitResponse")
-    public ResponseEntity<String> submitResponse(@RequestBody SubmitResponse response) {
-        DatabaseReference ref =
-                FirebaseDatabase.getInstance()
-                        .getReference("responses").child(response.date).child(response.testId).child(response.userId)
-                        .push();
+    public ResponseEntity<String> submitResponse(@RequestBody List<SubmitResponse> responses) {
+        for (SubmitResponse response : responses) {
+            DatabaseReference ref =
+                    FirebaseDatabase.getInstance()
+                            .getReference("responses").child(response.date).child(response.testId).child(response.userId)
+                            .push();
 
-        ref.setValueAsync(response.responses);
+            ref.setValueAsync(response.responses);
+        }
 
-        return ResponseEntity.ok("Responses submitted with key: " + ref.getKey());
+        return ResponseEntity.ok("Responses submitted...");
     }
 
 }
