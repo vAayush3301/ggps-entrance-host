@@ -28,6 +28,16 @@ public class TestController {
         return ResponseEntity.ok("Test created with key: " + ref.getKey());
     }
 
+    @PostMapping("/deleteTest")
+    public ResponseEntity<String> deleteTest(@RequestBody Test test) {
+        DatabaseReference ref = FirebaseDatabase.getInstance()
+                .getReference("tests").child(test.getTestId());
+
+        ref.removeValueAsync();
+
+        return ResponseEntity.ok("Test deleted.");
+    }
+
     @GetMapping("/get_tests")
     public List<Test> getAllTests() throws InterruptedException {
         DatabaseReference ref = FirebaseDatabase.getInstance()
