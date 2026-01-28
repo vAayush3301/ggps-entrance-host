@@ -42,6 +42,7 @@ public class TestController {
                 for (DataSnapshot testSnap : snapshot.getChildren()) {
                     String testId = testSnap.getKey();
                     String testName = testSnap.child("testName").getValue(String.class);
+                    int duration = testSnap.child("duration").getValue(Integer.class);
 
                     List<Question> questions = new ArrayList<>();
                     for (DataSnapshot qSnap : testSnap.child("questions").getChildren()) {
@@ -50,7 +51,7 @@ public class TestController {
                         else System.out.println("⚠️ Question null for key: " + qSnap.getKey());
                     }
 
-                    result.add(new Test(testId, testName, questions));
+                    result.add(new Test(testId, testName, questions, duration));
                 }
                 latch.countDown();
             }

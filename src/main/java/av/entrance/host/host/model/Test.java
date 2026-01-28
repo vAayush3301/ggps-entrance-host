@@ -6,14 +6,24 @@ public class Test {
     private String testId;
     private String testName;
     private List<Question> questions;
+    private int duration;
 
     public Test() {
     }
 
-    public Test(String testId, String testName, List<Question> questions) {
+    public Test(String testId, String testName, List<Question> questions, int duration) {
         this.testId = testId;
         this.testName = testName;
         this.questions = questions;
+        this.duration = duration;
+    }
+
+    public int getDuration() {
+        return duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
     }
 
     public String getTestName() {
