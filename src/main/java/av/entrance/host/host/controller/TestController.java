@@ -94,7 +94,7 @@ public class TestController {
     }
 
     @GetMapping("/get_results")
-    public List<SubmitResponse> getTestResults(@RequestBody String testId) throws InterruptedException {
+    public List<SubmitResponse> getTestResults(@RequestParam String testId) throws InterruptedException {
         DatabaseReference ref = FirebaseDatabase.getInstance()
                 .getReference("responses").child(testId);
 
