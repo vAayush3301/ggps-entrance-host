@@ -111,10 +111,12 @@ public class TestController {
                         String username = userSnap.getKey();
 
                         List<Response> responses = new ArrayList<>();
-                        for (DataSnapshot qSnap : userSnap.getChildren()) {
-                            Response res = qSnap.getValue(Response.class);
-                            if (res != null) responses.add(res);
-                            else System.out.println("⚠️ Question null for key: " + qSnap.getKey());
+                        for (DataSnapshot pushSnap : userSnap.getChildren()) {
+                            for (DataSnapshot qSnap : pushSnap.getChildren()) {
+                                Response res = qSnap.getValue(Response.class);
+                                if (res != null) responses.add(res);
+                                else System.out.println("⚠️ Question null for key: " + qSnap.getKey());
+                            }
                         }
                         result.add(new SubmitResponse(testId, username, testDate, responses));
                     }
