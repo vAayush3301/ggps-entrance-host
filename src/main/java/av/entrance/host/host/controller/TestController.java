@@ -1,6 +1,7 @@
 package av.entrance.host.host.controller;
 
 import av.entrance.host.host.model.Question;
+import av.entrance.host.host.model.Response;
 import av.entrance.host.host.model.SubmitResponse;
 import av.entrance.host.host.model.Test;
 import com.google.firebase.database.*;
@@ -92,4 +93,45 @@ public class TestController {
         return ResponseEntity.ok("Responses submitted...");
     }
 
+    @GetMapping("/get_results")
+    public List<SubmitResponse> getTestResults(@RequestBody String testId) throws InterruptedException {
+        DatabaseReference ref = FirebaseDatabase.getInstance()
+                .getReference("responses").child(testId);
+
+        List<SubmitResponse> result = new ArrayList<>();
+        CountDownLatch latch = new CountDownLatch(1);
+
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                for (DataSnapshot dateTestSnap : snapshot.getChildren()) {
+                    String testDate = dateTestSnap.getKey();
+
+                    for (DataSnapshot userSnap : dateTestSnap.getChildren()) {
+                        String username = userSnap.getKey();
+
+                        List<Response> responses = new ArrayList<>();
+                        for (DataSnapshot qSnap : userSnap.getChildren()) {
+                            Response res = qSnap.getValue(Response.class);
+                            if (res != null) responses.add(res);
+                            else System.out.println("⚠️ Question null for key: " + qSnap.getKey());
+                        }
+                        result.add(new SubmitResponse(testId, username, testDate, responses));
+                    }
+
+                }
+                latch.countDown();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                System.out.println("Firebase error: " + error.getMessage());
+                latch.countDown();
+            }
+        });
+
+        latch.await(10, TimeUnit.SECONDS);
+        System.out.println("Returning tests: " + result.size());
+        return result;
+    }
 }
