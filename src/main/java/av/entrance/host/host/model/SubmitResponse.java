@@ -9,4 +9,11 @@ public class SubmitResponse {
     public List<Response> responses;
 
     public SubmitResponse() {}
+
+    public SubmitResponse(String testId, String userId, String date, List<Response> responses) {
+        this.testId = testId;
+        this.userId = userId;
+        this.date = date;
+        this.responses = responses;
+    }
 }

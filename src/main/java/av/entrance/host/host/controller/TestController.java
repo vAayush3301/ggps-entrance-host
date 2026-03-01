@@ -83,7 +83,7 @@ public class TestController {
         for (SubmitResponse response : responses) {
             DatabaseReference ref =
                     FirebaseDatabase.getInstance()
-                            .getReference("responses").child(response.date).child(response.testId).child(response.userId)
+                            .getReference("responses").child(response.testId).child(response.date).child(response.userId)
                             .push();
 
             ref.setValueAsync(response.responses);
