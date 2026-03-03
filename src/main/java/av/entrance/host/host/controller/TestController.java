@@ -1,9 +1,6 @@
 package av.entrance.host.host.controller;
 
-import av.entrance.host.host.model.Question;
-import av.entrance.host.host.model.Response;
-import av.entrance.host.host.model.SubmitResponse;
-import av.entrance.host.host.model.Test;
+import av.entrance.host.host.model.*;
 import com.google.firebase.database.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -62,7 +59,14 @@ public class TestController {
                         else System.out.println("⚠️ Question null for key: " + qSnap.getKey());
                     }
 
-                    result.add(new Test(testId, testName, questions, duration));
+                    List<Image> imageKeys = new ArrayList<>();
+                    for (DataSnapshot imgSnap : testSnap.child("imageKeys").getChildren()) {
+                        Image img = imgSnap.getValue(Image.class);
+                        if (img != null) imageKeys.add(img);
+                        else System.out.println("⚠️ Image null for key: " + imgSnap.getKey());
+                    }
+
+                    result.add(new Test(testId, testName, questions, imageKeys, duration));
                 }
                 latch.countDown();
             }
