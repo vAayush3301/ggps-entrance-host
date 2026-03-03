@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteBucketRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
@@ -14,13 +15,14 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequ
 import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 @Service
-public class UploadService {
+public class ImageService {
     private final S3Client s3;
     private final S3Presigner presigner;
 
-    public UploadService(S3Client s3, S3Presigner presigner) {
+    public ImageService(S3Client s3, S3Presigner presigner) {
         this.s3 = s3;
         this.presigner = presigner;
     }
@@ -60,5 +62,12 @@ public class UploadService {
         PresignedGetObjectRequest presigned = presigner.presignGetObject(presignRequest);
 
         return presigned.url().toString();
+    }
+
+    public void deleteImage(String key) {
+        s3.deleteObject(builder -> builder
+                .bucket(System.getenv("BUCKET_NAME"))
+                .key(key)
+        );
     }
 }
