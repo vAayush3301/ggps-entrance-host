@@ -9,13 +9,14 @@ public class Test {
     private int duration;
     private List<Image> imageKeys;
 
-    public Test(String testId, String testName, List<Question> questions, List<Image> imageKeys, int duration) {
+    public Test() {
     }
 
-    public Test(String testId, String testName, List<Question> questions, int duration) {
+    public Test(String testId, String testName, List<Question> questions, List<Image> imageKeys, int duration) {
         this.testId = testId;
         this.testName = testName;
         this.questions = questions;
+        this.imageKeys = imageKeys;
         this.duration = duration;
     }
 
