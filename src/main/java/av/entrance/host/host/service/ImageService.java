@@ -3,6 +3,8 @@ package av.entrance.host.host.service;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.awscore.exception.AwsServiceException;
+import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteBucketRequest;
@@ -65,9 +67,18 @@ public class ImageService {
     }
 
     public void deleteImage(String key) {
-        s3.deleteObject(builder -> builder
-                .bucket(System.getenv("BUCKET_NAME"))
-                .key(key)
-        );
+        System.out.println("Delete requested for key: " + key);
+        System.out.println("Bucket: " + System.getenv("BUCKET_NAME"));
+
+        try {
+            s3.deleteObject(builder -> builder
+                    .bucket(System.getenv("BUCKET_NAME"))
+                    .key(key)
+            );
+        } catch (AwsServiceException e) {
+            throw new RuntimeException(e);
+        } catch (SdkClientException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

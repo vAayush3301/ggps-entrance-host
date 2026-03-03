@@ -29,6 +29,7 @@ public class ImageController {
 
     @DeleteMapping
     public ResponseEntity<String> delete(@RequestParam String key) {
+        System.out.println("Incoming delete call. Key = " + key);
         imageService.deleteImage(key);
         return ResponseEntity.ok("Image Deleted");
     }
