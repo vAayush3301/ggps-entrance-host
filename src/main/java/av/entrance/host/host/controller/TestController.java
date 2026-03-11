@@ -15,9 +15,12 @@ import java.util.concurrent.TimeUnit;
 public class TestController {
     @PostMapping("/create")
     public ResponseEntity<String> createTest(@RequestBody Test test) {
+        System.out.println(test.getClientId());
+        System.out.println(test);
         DatabaseReference ref =
                 FirebaseDatabase.getInstance()
-                        .getReference(test.getClientId()).child("tests")
+                        .getReference(test.getClientId())
+                        .child("tests")
                         .push();
 
         ref.setValueAsync(test);
