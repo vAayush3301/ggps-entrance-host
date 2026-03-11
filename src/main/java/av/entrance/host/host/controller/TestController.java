@@ -15,10 +15,9 @@ import java.util.concurrent.TimeUnit;
 public class TestController {
     @PostMapping("/create")
     public ResponseEntity<String> createTest(@RequestBody Test test) {
-
         DatabaseReference ref =
                 FirebaseDatabase.getInstance()
-                        .getReference("tests")
+                        .getReference(test.getClientId()).child("tests")
                         .push();
 
         ref.setValueAsync(test);
@@ -29,7 +28,7 @@ public class TestController {
     @PostMapping("/deleteTest")
     public ResponseEntity<String> deleteTest(@RequestBody Test test) {
         DatabaseReference ref = FirebaseDatabase.getInstance()
-                .getReference("tests").child(test.getTestId());
+                .getReference(test.getClientId()).child("tests").child(test.getTestId());
 
         ref.removeValueAsync();
 
@@ -37,9 +36,9 @@ public class TestController {
     }
 
     @GetMapping("/get_tests")
-    public List<Test> getAllTests() throws InterruptedException {
+    public List<Test> getAllTests(@RequestParam String clientId) throws InterruptedException {
         DatabaseReference ref = FirebaseDatabase.getInstance()
-                .getReference("tests");
+                .getReference(clientId).child("tests");
 
         List<Test> result = new ArrayList<>();
         CountDownLatch latch = new CountDownLatch(1);
@@ -84,11 +83,11 @@ public class TestController {
     }
 
     @PostMapping("/submitResponse")
-    public ResponseEntity<String> submitResponse(@RequestBody List<SubmitResponse> responses) {
+    public ResponseEntity<String> submitResponse(@RequestParam String clientId, @RequestBody List<SubmitResponse> responses) {
         for (SubmitResponse response : responses) {
             DatabaseReference ref =
                     FirebaseDatabase.getInstance()
-                            .getReference("responses").child(response.testId).child(response.date).child(response.userId)
+                            .getReference(clientId).child("responses").child(response.testId).child(response.date).child(response.userId)
                             .push();
 
             ref.setValueAsync(response.responses);
@@ -98,9 +97,9 @@ public class TestController {
     }
 
     @GetMapping("/get_results")
-    public List<SubmitResponse> getTestResults(@RequestParam String testId) throws InterruptedException {
+    public List<SubmitResponse> getTestResults(@RequestParam String testId, @RequestParam String clientId) throws InterruptedException {
         DatabaseReference ref = FirebaseDatabase.getInstance()
-                .getReference("responses").child(testId);
+                .getReference(clientId).child("responses").child(testId);
 
         List<SubmitResponse> result = new ArrayList<>();
         CountDownLatch latch = new CountDownLatch(1);

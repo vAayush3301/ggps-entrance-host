@@ -8,6 +8,7 @@ public class Test {
     private List<Question> questions;
     private int duration;
     private List<Image> imageKeys;
+    private String clientId;
 
     public Test() {
     }
@@ -58,5 +59,13 @@ public class Test {
 
     public void setTestId(String testId) {
         this.testId = testId;
+    }
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
     }
 }
