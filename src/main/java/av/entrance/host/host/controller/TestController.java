@@ -14,12 +14,11 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping("/api/test")
 public class TestController {
     @PostMapping("/create")
-    public ResponseEntity<String> createTest(@RequestBody Test test) {
-        System.out.println(test.getClientId());
-        System.out.println(test);
+    public ResponseEntity<String> createTest(@RequestParam String clientId, @RequestBody Test test) {
+        System.out.println(clientId);
         DatabaseReference ref =
                 FirebaseDatabase.getInstance()
-                        .getReference(test.getClientId())
+                        .getReference(clientId)
                         .child("tests")
                         .push();
 
@@ -29,9 +28,11 @@ public class TestController {
     }
 
     @PostMapping("/deleteTest")
-    public ResponseEntity<String> deleteTest(@RequestBody Test test) {
+    public ResponseEntity<String> deleteTest(@RequestParam String clientId, @RequestBody Test test) {
         DatabaseReference ref = FirebaseDatabase.getInstance()
-                .getReference(test.getClientId()).child("tests").child(test.getTestId());
+                .getReference(clientId)
+                .child("tests")
+                .child(test.getTestId());
 
         ref.removeValueAsync();
 
