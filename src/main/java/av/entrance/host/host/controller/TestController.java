@@ -1,9 +1,12 @@
 package av.entrance.host.host.controller;
 
 import av.entrance.host.host.model.*;
+import av.entrance.host.host.service.ImageService;
 import com.google.firebase.database.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +16,14 @@ import java.util.concurrent.TimeUnit;
 @RestController
 @RequestMapping("/api/test")
 public class TestController {
+    private final S3Client s3;
+    private final S3Presigner presigner;
+
+    public TestController(S3Client s3, S3Presigner presigner) {
+        this.s3 = s3;
+        this.presigner = presigner;
+    }
+
     @PostMapping("/create")
     public ResponseEntity<String> createTest(@RequestParam String clientId, @RequestBody Test test) {
         System.out.println(clientId);
@@ -33,6 +44,12 @@ public class TestController {
                 .getReference(clientId)
                 .child("tests")
                 .child(test.getTestId());
+
+        List<Image> images = test.getImageKeys();
+        ImageService imageService = new ImageService(s3, presigner);
+        for (Image image : images) {
+            imageService.deleteImage(image.getImageKey());
+        }
 
         ref.removeValueAsync();
 
