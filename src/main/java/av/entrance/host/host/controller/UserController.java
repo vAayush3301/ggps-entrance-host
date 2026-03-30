@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     @PostMapping("/createUser")
-    public ResponseEntity<String> createTest(@RequestParam String clientId, @RequestBody User user) {
+    public ResponseEntity<String> createUser(@RequestParam String clientId, @RequestBody User user) {
         System.out.println(clientId);
         DatabaseReference ref =
                 FirebaseDatabase.getInstance()
@@ -23,20 +23,5 @@ public class UserController {
         ref.setValueAsync(user);
 
         return ResponseEntity.ok("User created with key: " + ref.getKey());
-    }
-
-    @PostMapping("/updateUser")
-    public ResponseEntity<String> updateUser(@RequestParam String clientId, @RequestBody User user) {
-        System.out.println(clientId);
-        DatabaseReference ref =
-                FirebaseDatabase.getInstance()
-                        .getReference(clientId)
-                        .child("users")
-                        .child(clientId)
-                        .child(user.getUserId());
-
-        ref.setValueAsync(user);
-
-        return ResponseEntity.ok("User updated with key: " + ref.getKey());
     }
 }
