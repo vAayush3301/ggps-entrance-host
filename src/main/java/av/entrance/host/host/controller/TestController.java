@@ -3,6 +3,9 @@ package av.entrance.host.host.controller;
 import av.entrance.host.host.model.*;
 import av.entrance.host.host.service.ImageService;
 import com.google.firebase.database.*;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingException;
+import com.google.firebase.messaging.Message;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -35,7 +38,42 @@ public class TestController {
 
         ref.setValueAsync(test);
 
-        return ResponseEntity.ok("Test created with key: " + ref.getKey());
+        DatabaseReference userRef = FirebaseDatabase.getInstance()
+                .getReference(clientId)
+                .child("users");
+
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                for (DataSnapshot child : snapshot.getChildren()) {
+                    String token = child.getValue(String.class);
+                    if (token != null) {
+
+                        Message message = Message.builder()
+                                .setToken(token)
+                                .putData("title", "New Test Available")
+                                .putData("body", test.getTestName() + "\nAttempt Now")
+                                .build();
+
+                        String response;
+                        try {
+                            response = FirebaseMessaging.getInstance().send(message);
+                        } catch (FirebaseMessagingException e) {
+                            throw new RuntimeException(e);
+                        }
+
+                        System.out.println("Sent: " + response);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                System.err.println("Error: " + error.getMessage());
+            }
+        });
+
+        return ResponseEntity.ok("Test created with key: " + userRef.getKey());
     }
 
     @PostMapping("/deleteTest")

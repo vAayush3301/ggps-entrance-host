@@ -12,15 +12,13 @@ public class UserController {
 
     @PostMapping("/createUser")
     public ResponseEntity<String> createUser(@RequestParam String clientId, @RequestBody User user) {
-        System.out.println(clientId);
         DatabaseReference ref =
                 FirebaseDatabase.getInstance()
                         .getReference(clientId)
                         .child("users")
-                        .child(clientId)
                         .child(user.getUserId());
 
-        ref.setValueAsync(user);
+        ref.setValueAsync(user.getToken());
 
         return ResponseEntity.ok("User created with key: " + ref.getKey());
     }
