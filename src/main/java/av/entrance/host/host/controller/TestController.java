@@ -136,7 +136,7 @@ public class TestController {
             }
         });
 
-        latch.await(10, TimeUnit.SECONDS);
+        latch.await(120, TimeUnit.MINUTES);
         System.out.println("Returning tests: " + result.size());
         return result;
     }
